@@ -35,7 +35,6 @@ jobs:
         composer install --prefer-dist --no-progress --no-dev
     - name: Install dependencies2
       run: |
-        cd ..
         cd oauth-microsoft-live
         composer install --prefer-dist --no-progress --no-dev
     - uses: benjlevesque/short-sha@v1.2
