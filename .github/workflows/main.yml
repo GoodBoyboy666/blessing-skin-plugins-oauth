@@ -29,14 +29,19 @@ jobs:
         path: vendor
         key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
         restore-keys: ${{ runner.os }}-composer-
-    - name: Install dependencies
+    - name: Install dependencies1
       run: |
         cd oauth
+        composer install --prefer-dist --no-progress --no-dev
+    - name: Install dependencies2
+      run: |
+        cd ..
+        cd oauth-microsoft-live
         composer install --prefer-dist --no-progress --no-dev
     - uses: benjlevesque/short-sha@v1.2
       id: short-sha
     - name: Archive release
-      run: zip -9 -r blessing-skin-oauth-${{ steps.short-sha.outputs.sha }}.zip oauth
+      run: zip -9 -r blessing-skin-oauth-${{ steps.short-sha.outputs.sha }}.zip oauth oauth-microsoft-live
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
