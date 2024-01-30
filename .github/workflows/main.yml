@@ -1,0 +1,43 @@
+name: CI
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Init PHP with specific version
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, dom, fileinfo, sqlite, gd, zip
+    - name: Cache Node dependencies
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-yarn-lock-${{ hashFiles('yarn.lock') }}
+        restore-keys: ${{ runner.os }}-yarn-lock-
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+    - name: Install dependencies
+      run: |
+        cd oauth
+        composer install --prefer-dist --no-progress --no-dev
+    - uses: benjlevesque/short-sha@v1.2
+      id: short-sha
+    - name: Archive release
+      run: zip -9 -r blessing-skin-oauth-${{ steps.short-sha.outputs.sha }}.zip oauth
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        path: blessing-skin-oauth-${{ steps.short-sha.outputs.sha }}.zip
